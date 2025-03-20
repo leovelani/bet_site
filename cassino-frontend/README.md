@@ -40,3 +40,4 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 ### 🔹 **Rodando o Backend**
 
 ### 🔹 **Rodando o Frontend**
+```npx create-react-app casino-frontend --template typescript``` 
