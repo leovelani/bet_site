@@ -25,7 +25,7 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 | Padrão GoF      | Objetivo |
 |----------------|------------------------------------------------|
 | **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta). |
-| **Singleton** | Garantir um único estado da Roleta. |
+| **Singleton** | Garantir uma única instância de um objeto. |
 | **Prototype** | Duplicar apostas sem recriar objetos manualmente. |
 | **Bridge** | Separar a lógica dos jogos do frontend. |
 | **Composite** | Organizar os jogos no React como componentes reutilizáveis. |
