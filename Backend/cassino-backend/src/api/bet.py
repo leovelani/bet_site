@@ -18,12 +18,14 @@ def get_db():
 def coinflip(user_id: int, amount: float, choice: str, db: Session = Depends(get_db)):
     if choice not in ["cara", "coroa"]:
         return {"error": "Escolha 'cara' ou 'coroa'"}
+    else if choice not in["1","2"]:
+        return {"error": "Escolha 'cara' ou 'coroa'"}
 
     new_balance = update_balance(db, user_id, -amount)
     if new_balance is None:
         return {"error": "Saldo insuficiente"}
-
-    resultado = random.choice(["cara", "coroa"])
+    if choice in ["cara","coroa"]
+        resultado = random.choice(["cara", "coroa"])
     won = choice == resultado
     if won:
         new_balance = update_balance(db, user_id, amount * 2)
