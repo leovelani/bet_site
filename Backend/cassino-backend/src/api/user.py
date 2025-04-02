@@ -22,7 +22,7 @@ def check_balance(user_id: int, db: Session = Depends(get_db)):
     return {"error": "Usuário não encontrado"}
 
 @router.post("/user_service/inser_user")
-def insert_user(id:int,username:str, balance:int,db:Session = Depends(get_db)):
+def insert_user(id:int,username:str, balance:float,db:Session = Depends(get_db)):
     
     id = id
     balance = balance
