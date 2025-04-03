@@ -38,6 +38,18 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 ## 🛠️ Como Rodar o Projeto
 
 ### 🔹 **Rodando o Backend**
+Baixar o docker.
+
+Primeiro criar o banco de dados no postgres
+Nome : cassino_db
+
+Criar a imagem do docker :
+docker build -t fastapi_cassino .
+
+Rodar o docker:
+docker run -p 8000:8000 fastapi_cassino
+
+Depois ele vai ficar rodando indefinidamente , para parar ele aperte ctrl+c
 
 ### 🔹 **Rodando o Frontend**
 ```npx create-react-app cassino-frontend --template typescript``` 
