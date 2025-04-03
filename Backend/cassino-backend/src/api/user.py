@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.models.database import SessionLocal
+#from src.models.database import SessionLocal
+from src.models.database import AsyncSessionLocal
 from src.models.user import User
 from src.services.balance import get_balance
 from src.services.user_service import create_user
@@ -8,7 +9,7 @@ from src.services.user_service import create_user
 router = APIRouter()
 
 def get_db():
-    db = SessionLocal()
+    db = AsyncSessionLocal()
     try:
         yield db
     finally:

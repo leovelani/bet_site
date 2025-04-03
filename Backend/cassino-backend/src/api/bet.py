@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.models.database import SessionLocal
+#from src.models.database import SessionLocal
+from src.models.database import AsyncSessionLocal
 from src.models.bet import Bet
 from src.services.balance import update_balance
 from src.services.bet_service import register_bet
@@ -9,7 +10,7 @@ import random
 router = APIRouter()
 
 def get_db():
-    db = SessionLocal()
+    db = AsyncSessionLocal()
     try:
         yield db
     finally:

@@ -2,12 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from src.api import user, bet
-from src.models.database import engine
+from src.models.database import engine, Base
+
+
 
 # Criação do lifespan para eventos de inicialização e finalização
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 Iniciando aplicação...")
+#    Base.metadata.create_all(bind=engine)
     yield  # O servidor roda enquanto não sair desse `yield`
     print("🛑 Encerrando aplicação...")
     await close_db_connection()
@@ -27,6 +30,7 @@ app.add_middleware(
     allow_methods=["*"],  # Permite todos os métodos HTTP
     allow_headers=["*"],  # Permite todos os cabeçalhos
 )
+
 
 # Adicionar rotas
 app.include_router(user.router, prefix="/user", tags=["User"])
