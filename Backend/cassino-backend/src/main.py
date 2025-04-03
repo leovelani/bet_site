@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from src.api import user, bet
 from src.models.database import engine
@@ -17,6 +18,15 @@ async def close_db_connection():
     await engine.dispose()
 
 app = FastAPI(lifespan=lifespan)
+
+# ✅ Adicionando o Middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite todas as origens (use domínios específicos em produção)
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos os métodos HTTP
+    allow_headers=["*"],  # Permite todos os cabeçalhos
+)
 
 # Adicionar rotas
 app.include_router(user.router, prefix="/user", tags=["User"])

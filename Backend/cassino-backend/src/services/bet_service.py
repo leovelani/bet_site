@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from src.models.bet import Bet
 
-def register_bet(db: Session, game: str, bet_number: int, bet_amount: float, result: int, win: bool):
+def register_bet(db: Session,id: int,user_id: str, game: str, amount: float, result: str):
     bet = Bet(
+        id=id,
+        user_id=user_id,
         game=game,
-        bet_number=bet_number,
-        bet_amount=bet_amount,
+        amount=amount,
         result=result,
-        win=win
     )
     db.add(bet)
     db.commit()
