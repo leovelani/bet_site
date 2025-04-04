@@ -22,7 +22,7 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 
 ## 🏗️ Padrões GoF Utilizados
 
-| Padrão GoF      | Objetivo | 
+| Padrão GoF      | Objetivo | Frontend | Backend |
 |----------------|------------------------------------------------|
 | **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta). | ✅ | ❌ |
 | **Singleton** | Garantir uma única instância de um objeto. | ❌ | ❌ |
