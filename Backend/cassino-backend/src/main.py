@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from src.api import user, bet
-from src.models.database import engine, Base
+from src.models.database import engine, Base, init_db
 
 
 
@@ -11,6 +11,7 @@ from src.models.database import engine, Base
 async def lifespan(app: FastAPI):
     print("🚀 Iniciando aplicação...")
 #    Base.metadata.create_all(bind=engine)
+    await init_db()
     yield  # O servidor roda enquanto não sair desse `yield`
     print("🛑 Encerrando aplicação...")
     await close_db_connection()

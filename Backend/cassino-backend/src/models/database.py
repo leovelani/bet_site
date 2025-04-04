@@ -1,22 +1,35 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker # declarative_base
 
-# Carregar variáveis de ambiente
-load_dotenv()
+# Carregar variáveis de ambiente do .env
+#load_dotenv()
 
 DATABASE_URL = f"postgresql+asyncpg://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 
-# Criar a engine do SQLAlchemy
+# Criar a engine assíncrona do SQLAlchemy
 engine = create_async_engine(DATABASE_URL, echo=True)
-#SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Criar a sessão assíncrona
 AsyncSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
     bind=engine,
-    class_=AsyncSession
+    class_=AsyncSession,
+    expire_on_commit=False, 
+    autocommit=False, 
+    autoflush=False
 )
+
+# Base para os modelos do SQLAlchemy
 Base = declarative_base()
+
+from src.models.user import User
+from src.models.bet import Bet
+
+# Função para criar as tabelas no banco de dados ao iniciar a aplicação
+async def init_db():
+    async with engine.begin() as conn:
+        print("criando tabelas")
+        await conn.run_sync(Base.metadata.create_all)
+        print("tabelas criadas")

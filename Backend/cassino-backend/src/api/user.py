@@ -8,12 +8,12 @@ from src.services.user_service import create_user
 
 router = APIRouter()
 
-def get_db():
+async def get_db():
     db = AsyncSessionLocal()
     try:
         yield db
     finally:
-        db.close()
+        await db.close()
 
 @router.get("/balance/{user_id}")
 def check_balance(user_id: int, db: Session = Depends(get_db)):
@@ -23,10 +23,14 @@ def check_balance(user_id: int, db: Session = Depends(get_db)):
     return {"error": "Usuário não encontrado"}
 
 @router.post("/user_service/inser_user")
-def insert_user(id:int,username:str, balance:float,db:Session = Depends(get_db)):
+async def insert_user(id:int,username:str, balance:float,db:Session = Depends(get_db)):
     
     id = id
     balance = balance
     username = username
-    new_user = create_user(db,username,id,balance)
-    return new_user
+    new_user = await create_user(db,username,id,balance)
+    return {
+        "id": new_user.id,
+        "username": new_user.username,
+        "balance":new_user.balance
+    }
