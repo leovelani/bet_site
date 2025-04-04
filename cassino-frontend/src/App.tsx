@@ -1,22 +1,24 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
-import Home from "./pages/Home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/home/Home";
 import CoinFlip from "./games/CoinFlip/CoinFlip";
 import Roulette from "./games/Roulette/Roulette";
 import { GameFactory } from "./games/GameFactory";
-import Navbar from "./components/Navbar";;
-
-const GamePage: React.FC = () => {
-  const { gameType } = useParams<{ gameType: "coinflip" | "roulette" }>();
-  return GameFactory.createGame(gameType as "coinflip" | "roulette");
-};
+import Navbar from "./components/Navbar";
+import Perfil from "./pages/perfil/Perfil";
 
 const App: React.FC = () => {
+  const userId = localStorage.getItem("user_id");
+
   return (
     <Router>
-      <Navbar />
+      {userId && <Navbar />}
+
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Perfil />} />
+
+        <Route path="/home" element={<Home />} />
         <Route path="/coinflip" element={<CoinFlip />} />
         <Route path="/roulette" element={<Roulette />} />
       </Routes>
