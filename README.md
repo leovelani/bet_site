@@ -40,14 +40,8 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 ### 🔹 **Rodando o Backend**
 Baixar o docker.
 
-Primeiro criar o banco de dados no postgres
-Nome : cassino_db
-
-Criar a imagem do docker :
-docker build -t fastapi_cassino .
-
 Rodar o docker:
-docker run -p 8000:8000 fastapi_cassino
+docker-compose up --build
 
 Depois ele vai ficar rodando indefinidamente , para parar ele aperte ctrl+c
 
