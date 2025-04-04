@@ -44,13 +44,10 @@ Rodar o docker
 docker-compose up --build
 
 caso o docker nao estiver funcionando tenha certesa de que o ubuntun estaja na maquina use
-wsl --install![image](https://github.com/user-attachments/assets/63519385-8ac6-459e-ad32-21269e868308)
-
+wsl --install
 
 para ver o servidor do fastapi vá para 
 http://localhost:8000/docs
-![image](https://github.com/user-attachments/assets/8389048d-39c9-4fe0-bede-e247321e72f5)
-
 
 Depois ele vai ficar rodando indefinidamente , para parar ele aperte ctrl+c
 
