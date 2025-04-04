@@ -23,14 +23,14 @@ async def check_balance(user_id: int, db: Session = Depends(get_db)):
     return {"error": "Usuário não encontrado"}
 
 @router.post("/user_service/inser_user")
-async def insert_user(id:int,username:str, balance:float,db:Session = Depends(get_db)):
+async def insert_user(username:str, balance:float,db:Session = Depends(get_db)):
     
-    id = id
+#    id = id
     balance = balance
     username = username
-    new_user = await create_user(db,username,id,balance)
+    new_user = await create_user(db,username,balance)
     return {
-        "id": new_user.id,
+#        "id": new_user.id,
         "username": new_user.username,
         "balance":new_user.balance
     }

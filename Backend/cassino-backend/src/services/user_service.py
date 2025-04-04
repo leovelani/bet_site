@@ -13,9 +13,9 @@ async def get_user_by_username(db: AsyncSession, username: str):
     result = await db.execute(select(User).filter(User.username == username))
     return result.scalars().first()
 
-async def create_user(db: Session, username: str, id: str, balance: int):
+async def create_user(db: Session, username: str, balance: int):
  #   hashed_password = pwd_context.hash(password)
-    new_user =  User(username=username, id=id,balance=balance)
+    new_user =  User(username=username,balance=balance)
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)

@@ -16,9 +16,9 @@ from src.models.bet import Bet
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-async def register_bet(db: AsyncSession, id: int, user_id: str, game: str, amount: float, result: str):
+async def register_bet(db: AsyncSession, user_id: str, game: str, amount: float, result: str):
     bet = Bet(
-        id=id,
+#        id=id,
         user_id=user_id,
         game=game,
         amount=amount,

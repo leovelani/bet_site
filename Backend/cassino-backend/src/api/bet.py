@@ -11,12 +11,12 @@ import random
 
 router = APIRouter()
 
-def get_db():
+async def get_db():
     db = AsyncSessionLocal()
     try:
         yield db
     finally:
-        db.close()
+       await db.close()
 
 #@router.get("/bets")
 #def list_bets(db: Session = Depends(get_db)):
@@ -69,9 +69,9 @@ async def coinflip(user_id: int, amount: float, choice: str, db: AsyncSession = 
 
     if won:
         new_balance = await update_balance(db, user_id, amount * 2)
-        await register_bet(db, 1, user_id, "coinflip", amount, "win")
+        await register_bet(db, user_id, "coinflip", amount, "win")
     else:
-        await register_bet(db, 1, user_id, "coinflip", amount, "lose")
+        await register_bet(db, user_id, "coinflip", amount, "lose")
 
     return {"resultado": resultado, "ganhou": won, "new_balance": new_balance}
 '''
@@ -93,8 +93,6 @@ def roleta(user_id: int, amount:float, choice: int, db: Session = Depends(get_db
     '''
 @router.post("/bet/roleta")
 async def roleta(user_id: int, amount: float, choice: int, db: AsyncSession = Depends(get_db)):
-    from src.services.balance import update_balance
-    from src.services.bet_service import register_bet
     import random
 
     # Validação do número escolhido
@@ -113,9 +111,9 @@ async def roleta(user_id: int, amount: float, choice: int, db: AsyncSession = De
     # Se ganhou, dobra o valor apostado
     if won:
         new_balance = await update_balance(db, user_id, amount * 2)
-        await register_bet(db, None, user_id, "roleta", amount, "win")
+        await register_bet(db, user_id, "roleta", amount, "win")
     else:
-        await register_bet(db, None, user_id, "roleta", amount, "lose")
+        await register_bet(db, user_id, "roleta", amount, "lose")
 
     return {
         "resultado": resultado,
