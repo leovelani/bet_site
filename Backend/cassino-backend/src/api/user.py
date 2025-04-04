@@ -16,8 +16,8 @@ async def get_db():
         await db.close()
 
 @router.get("/balance/{user_id}")
-def check_balance(user_id: int, db: Session = Depends(get_db)):
-    balance = get_balance(db, user_id)
+async def check_balance(user_id: int, db: Session = Depends(get_db)):
+    balance = await get_balance(db, user_id)
     if balance is not None:
         return {"user_id": user_id, "balance": balance}
     return {"error": "Usuário não encontrado"}
