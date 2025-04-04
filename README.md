@@ -41,13 +41,17 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 Baixar o docker.
 
 Rodar o docker
+
 docker-compose up --build
 
 caso nao tenha instalado.
+
 Instalar o Windows Subsystem for Linux (WSL).
+
 wsl --install
 
 para ver o servidor do fastapi vá para 
+
 http://localhost:8000/docs
 
 Depois ele vai ficar rodando indefinidamente , para parar ele aperte ctrl+c
