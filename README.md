@@ -22,18 +22,18 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 
 ## 🏗️ Padrões GoF Utilizados
 
-| Padrão GoF      | Objetivo 
-|----------------|------------------------------------------------|
-| **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta). | ✅ | ❌ |
-| **Singleton** | Garantir uma única instância de um objeto. | ❌ | ❌ |
-| **Prototype** | Duplicar apostas sem recriar objetos manualmente. | ❌ | ❌ |
-| **Bridge** | Separar a lógica dos jogos do frontend. | ❌ | ❌ |
-| **Composite** | Organizar os jogos no React como componentes reutilizáveis. | ❌ | ❌ |
-| **Adapter** | Conectar APIs externas sem modificar a lógica interna. | ❌ | ❌ |
-| **State** | Controlar os estados do jogo. | ❌ | ❌ |
-| **Strategy** | Diferentes estratégias de apostas. | ❌ | ❌ |
-| **Command** | Registrar apostas e jogadas. | ❌ | ❌ |
-| **Observer** | Notificar jogadores dos resultados. | ❌ | ❌ |
+| Padrão GoF       | Objetivo                                                         | Frontend | Backend |
+|------------------|------------------------------------------------------------------|----------|---------|
+| **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta).                      | ✅        | ❌       |
+| **Singleton**      | Garantir uma única instância de um objeto.                      | ❌        | ❌       |
+| **Prototype**      | Duplicar apostas sem recriar objetos manualmente.               | ❌        | ❌       |
+| **Bridge**         | Separar a lógica dos jogos do frontend.                         | ❌        | ❌       |
+| **Composite**      | Organizar os jogos no React como componentes reutilizáveis.     | ❌        | ❌       |
+| **Adapter**        | Conectar APIs externas sem modificar a lógica interna.          | ❌        | ❌       |
+| **State**          | Controlar os estados do jogo.                                   | ❌        | ❌       |
+| **Strategy**       | Diferentes estratégias de apostas.                              | ❌        | ❌       |
+| **Command**        | Registrar apostas e jogadas.                                    | ❌        | ❌       |
+| **Observer**       | Notificar jogadores dos resultados.                             | ❌        | ❌       |
 
 ## 🛠️ Como Rodar o Projeto
 
