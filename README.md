@@ -43,7 +43,8 @@ Baixar o docker.
 Rodar o docker
 docker-compose up --build
 
-caso o docker nao estiver funcionando tenha certesa de que o ubuntun estaja na maquina use
+caso nao tenha instalado
+Instalar o Windows Subsystem for Linux (WSL)
 wsl --install
 
 para ver o servidor do fastapi vá para 
