@@ -8,7 +8,7 @@ interface GameContextProps {
 const GameContext = createContext<GameContextProps | null>(null);
 
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
-  const [balance, setBalance] = useState(1000); // Saldo inicial fictício
+  const [balance, setBalance] = useState(1000000); // Saldo inicial fictício
 
   return (
     <GameContext.Provider value={{ balance, setBalance }}>

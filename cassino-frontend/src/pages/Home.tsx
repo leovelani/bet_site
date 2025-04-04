@@ -1,10 +1,12 @@
 import React from "react";
+import "./Home.css"; 
 
 const Home: React.FC = () => {
   return (
-    <div>
-      <h1>Bem-vindo ao Cassino</h1>
-      <p>Escolha um jogo no menu acima.</p>
+    <div className="home-container">
+      <h1>🎰 Bem-vindo ao Cassino Virtual!</h1>
+      <p>Escolha um dos jogos no menu acima e teste sua sorte!</p>
+      <p>Você pode apostar em Coin Flip ou Roleta.</p>
     </div>
   );
 };

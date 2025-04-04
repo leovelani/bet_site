@@ -35,10 +35,9 @@ const CoinFlip: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="coinflip-page">
       <h2>Coin Flip</h2>
 
-      {/* Opções de Aposta */}
       <div className="bet-options">
         <label>
           Valor da Aposta: $
