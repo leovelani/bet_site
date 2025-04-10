@@ -6,6 +6,7 @@ from sqlalchemy.future import select
 from src.models.bet import Bet
 from src.services.balance import update_balance
 from src.services.bet_service import register_bet
+from src.services.user_service import get_user_by_username
 import random
 
 router = APIRouter()
@@ -28,7 +29,9 @@ async def list_bets(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/bet/coinflip")
-async def coinflip(user_id: int, amount: float, choice: str, db: AsyncSession = Depends(get_db)):
+async def coinflip( amount: float, choice: str,nome:str, db: AsyncSession = Depends(get_db)):
+    user = await get_user_by_username(db,nome)
+    user_id = user.id
     if choice not in ["cara", "coroa"]:
         return {"erro": "Escolha 'cara' ou 'coroa'"}
 
@@ -48,9 +51,10 @@ async def coinflip(user_id: int, amount: float, choice: str, db: AsyncSession = 
     return {"resultado": resultado, "ganhou": won, "new_balance": new_balance}
 
 @router.post("/bet/roleta")
-async def roleta(user_id: int, amount: float, choice: int, db: AsyncSession = Depends(get_db)):
+async def roleta(nome:str, amount: float, choice: int, db: AsyncSession = Depends(get_db)):
     import random
-
+    user = await get_user_by_username(db,nome)
+    user_id = user.id
     # Validação do número escolhido
     if not (1 <= choice <= 36):
         return {"erro": "Escolha um número entre 1 e 36"}
