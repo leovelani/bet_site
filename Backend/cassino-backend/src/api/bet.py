@@ -29,7 +29,7 @@ async def list_bets(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/bet/coinflip")
-async def coinflip( amount: float, choice: str,nome:str, db: AsyncSession = Depends(get_db)):
+async def coinflip( amount: float, choice: str,nome:str,multiplier:int ,db: AsyncSession = Depends(get_db)):
     user = await get_user_by_username(db,nome)
     user_id = user.id
     if choice not in ["cara", "coroa"]:
@@ -43,7 +43,7 @@ async def coinflip( amount: float, choice: str,nome:str, db: AsyncSession = Depe
     won = choice == resultado
 
     if won:
-        new_balance = await update_balance(db, user_id, amount * 2)
+        new_balance = await update_balance(db, user_id, amount * multiplier)
         await register_bet(db, user_id, "coinflip", amount, "win")
     else:
         await register_bet(db, user_id, "coinflip", amount, "lose")
@@ -51,7 +51,7 @@ async def coinflip( amount: float, choice: str,nome:str, db: AsyncSession = Depe
     return {"resultado": resultado, "ganhou": won, "new_balance": new_balance}
 
 @router.post("/bet/roleta")
-async def roleta(nome:str, amount: float, choice: int, db: AsyncSession = Depends(get_db)):
+async def roleta(nome:str, amount: float, choice: int,multiplier: int ,db: AsyncSession = Depends(get_db)):
     import random
     user = await get_user_by_username(db,nome)
     user_id = user.id
@@ -70,7 +70,7 @@ async def roleta(nome:str, amount: float, choice: int, db: AsyncSession = Depend
 
     # Se ganhou, dobra o valor apostado
     if won:
-        new_balance = await update_balance(db, user_id, amount * 2)
+        new_balance = await update_balance(db, user_id, amount * multiplier)
         await register_bet(db, user_id, "roleta", amount, "win")
     else:
         await register_bet(db, user_id, "roleta", amount, "lose")
