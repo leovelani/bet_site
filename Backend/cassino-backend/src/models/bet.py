@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, Float, String, ForeignKey
-#from sqlalchemy.orm import relationship
 from .database import Base
 
 class Bet(Base):
@@ -11,5 +10,3 @@ class Bet(Base):
     amount = Column(Float)
     result = Column(String)  # 'win' ou 'lose'
 
-    # Relacionamento com o usuário
-   # user = relationship("User")
