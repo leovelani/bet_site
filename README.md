@@ -5,7 +5,7 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 ## 👥 Integrantes
 - **Lucas Goshi**
 - **Leonardo Gomes Velani**
-- **Guilherme Covaleski**
+- **Guilherme Covaleki**
 - **Renato Sussumu**
 - **Nicolas Lopes**
 
