@@ -47,4 +47,8 @@ async def atualisacao(username:str,balance:float,db:Session = Depends(get_db)):
     user = await get_user_by_username(db,username)
     user_id = user.id
     new_info = await update(db,user_id,balance)
-    return new_info
+    return {
+        "usuario":username,
+        "id":user_id,
+        "balance":new_info
+    }
