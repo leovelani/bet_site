@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from src.models.database import AsyncSessionLocal
 from src.models.user import User
 from src.services.balance import get_balance
-from src.services.user_service import create_user, get_user_by_username
+from src.services.user_service import create_user, get_user_by_username,update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -41,3 +41,10 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 
     # 🟢 Transformar os objetos SQLAlchemy em dicionários serializáveis
     return [user.__dict__ for user in user]
+
+@router.put("/user/atualisacao")
+async def atualisacao(username:str,balance:float,db:Session = Depends(get_db)):
+    user = await get_user_by_username(db,username)
+    user_id = user.id
+    new_info = await update(db,user_id,balance)
+    return new_info

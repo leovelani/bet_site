@@ -14,3 +14,12 @@ async def create_user(db: Session, username: str, balance: int):
     await db.commit()
     await db.refresh(new_user)
     return new_user
+
+async def update(db:Session,user_id:int,balance:float):
+    result = await db.execute(select(User).filter(User.id == user_id))
+    user = result.scalars().first()
+
+    user.balance += balance
+    await db.commit()  # Confirma a transação
+    await db.refresh(user)  # Atualiza os dados do usuário
+    return user.balance
