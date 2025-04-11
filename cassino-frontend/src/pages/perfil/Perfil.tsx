@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PerfilList from '../../components/profile/PerfilList';
-import '../perfil/Perfil.css'; 
+import { useNavigate } from 'react-router-dom';
+import './Perfil.css';
 
 const Perfil: React.FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const userId = localStorage.getItem("user_id");
+    if (userId) {
+      navigate("/home");
+    }
+  }, []);
+
   return (
     <div className="select-profile-page">
-      <h1>Quem está jogando?</h1>
+      <h1>QUEM ESTÁ JOGANDO?</h1>
       <PerfilList />
     </div>
   );

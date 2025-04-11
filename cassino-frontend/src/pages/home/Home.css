@@ -3,7 +3,7 @@
     z-index: 1;
     background: url("/public/images/background_home.jpg") no-repeat center center fixed;
     background-size: cover;
-    height: 71.5vh;
+    height: 75.5vh;
     text-align: center;
     display: flex;
     flex-direction: column;

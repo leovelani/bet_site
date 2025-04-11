@@ -12,7 +12,7 @@ const PerfilList: React.FC = () => {
 
   useEffect(() => {
     const fetchProfiles = async () => {
-      const data = await api.get('/user_service/get_users'); // Crie essa rota se ainda não existir
+      const data = await api.get('/user/user'); // Crie essa rota se ainda não existir
       setUsers(data.data);
     };
     fetchProfiles();

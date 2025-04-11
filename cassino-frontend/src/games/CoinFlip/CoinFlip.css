@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 60px; 
+  padding-top: 60px;
   background: linear-gradient(to bottom, #111, #222);
   color: #fff;
   font-family: 'Segoe UI', sans-serif;
@@ -64,6 +64,7 @@
   align-items: center;
   font-size: 28px;
   font-weight: bold;
+  text-transform: capitalize; /* <-- Primeira letra maiúscula */
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
   position: relative;
   transform-style: preserve-3d;
@@ -80,7 +81,7 @@
   }
 
   100% {
-    transform: rotateY(1800deg);
+    transform: rotateY(2160deg); /* 6 voltas = 6 x 360 */
   }
 }
 
