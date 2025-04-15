@@ -42,7 +42,7 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 - Rodar o docker
 
 ```bash
-docker-compose up --buildb vnm
+docker-compose up --build
 ```
 - Para acessar o servidor do backend:
 
