@@ -42,8 +42,8 @@ async def get_users(db: AsyncSession = Depends(get_db)):
     # 🟢 Transformar os objetos SQLAlchemy em dicionários serializáveis
     return [user.__dict__ for user in user]
 
-@router.put("/user/atualisacao")
-async def atualisacao(username:str,balance:float,db:Session = Depends(get_db)):
+@router.put("/user/atualizacao")
+async def atualizacao(username:str,balance:float,db:Session = Depends(get_db)):
     user = await get_user_by_username(db,username)
     user_id = user.id
     new_info = await update(db,user_id,balance)
