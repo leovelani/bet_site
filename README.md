@@ -37,24 +37,21 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 
 ## 🛠️ Como Rodar o Projeto
 
-### 🔹 **Rodando o Backend**
-Baixar o docker.
+- Baixar o docker
 
-Rodar o docker
+- Rodar o docker
 
-docker-compose up --build
+```bash
+docker-compose up --buildb vnm
+```
+- Para acessar o servidor do backend:
 
-caso nao tenha instalado.
-
-Instalar o Windows Subsystem for Linux (WSL).
-
-wsl --install
-
-para ver o servidor do fastapi vá para 
-
+```bash
 http://localhost:8000/docs
+```
+- Para acessar o servidor do frontend:
 
-Depois ele vai ficar rodando indefinidamente , para parar ele aperte ctrl+c
-
-### 🔹 **Rodando o Frontend**
-```npx create-react-app cassino-frontend --template typescript``` 
+```bash
+http://localhost:3000
+```
+- Em caso de atualizar o back, precisar dar "CTRL + C" e rodar o comando do docker novamente
