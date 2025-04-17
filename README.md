@@ -27,7 +27,7 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 | **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta).                      | ✅        | ✅       | GameFactory.tsx, bet_service.py |
 | **Singleton**      | Garantir uma única instância de um objeto.                      | ❌        | ✅       | database.py |
 | **Prototype**      | Duplicar apostas sem recriar objetos manualmente.               | ❌        | ❌       | — |
-| **Bridge**         | Separar a lógica dos jogos do frontend.                         | ❌        | ❌       | — |
+| **Bridge**         | Separar a lógica dos jogos do frontend.                         | ✅        | ❌       | useGameState.ts, CoinFlipStates.ts  |
 | **Composite**      | Organizar os jogos no React como componentes reutilizáveis.     | ✅        | ❌       | GameFactory.tsx |
 | **Adapter**        | Conectar APIs externas sem modificar a lógica interna.          | ✅        | ❌       | api.ts (Axios) |
 | **State**          | Controlar os estados do jogo.                                   | ✅        | ❌       | useGameState.ts, CoinFlipStates.ts |
