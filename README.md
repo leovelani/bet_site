@@ -22,18 +22,18 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 
 ## 🏗️ Padrões GoF Utilizados
 
-| Padrão GoF       | Objetivo                                                         | Frontend | Backend |
-|------------------|------------------------------------------------------------------|----------|---------|
-| **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta).                      | ✅        | ❌       |
-| **Singleton**      | Garantir uma única instância de um objeto.                      | ❌        | ❌       |
-| **Prototype**      | Duplicar apostas sem recriar objetos manualmente.               | ❌        | ❌       |
-| **Bridge**         | Separar a lógica dos jogos do frontend.                         | ❌        | ❌       |
-| **Composite**      | Organizar os jogos no React como componentes reutilizáveis.     | ❌        | ❌       |
-| **Adapter**        | Conectar APIs externas sem modificar a lógica interna.          | ❌        | ❌       |
-| **State**          | Controlar os estados do jogo.                                   | ❌        | ❌       |
-| **Strategy**       | Diferentes estratégias de apostas.                              | ❌        | ❌       |
-| **Command**        | Registrar apostas e jogadas.                                    | ❌        | ❌       |
-| **Observer**       | Notificar jogadores dos resultados.                             | ❌        | ❌       |
+| Padrão GoF       | Objetivo                                                         | Frontend | Backend | Arquivo(s) Relacionado(s) |
+|------------------|------------------------------------------------------------------|----------|---------|-----------------------------|
+| **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta).                      | ✅        | ✅       | GameFactory.tsx, bet_service.py |
+| **Singleton**      | Garantir uma única instância de um objeto.                      | ❌        | ✅       | database.py |
+| **Prototype**      | Duplicar apostas sem recriar objetos manualmente.               | ❌        | ❌       | — |
+| **Bridge**         | Separar a lógica dos jogos do frontend.                         | ❌        | ❌       | — |
+| **Composite**      | Organizar os jogos no React como componentes reutilizáveis.     | ✅        | ❌       | GameFactory.tsx |
+| **Adapter**        | Conectar APIs externas sem modificar a lógica interna.          | ✅        | ❌       | api.ts (Axios) |
+| **State**          | Controlar os estados do jogo.                                   | ✅        | ❌       | useGameState.ts, CoinFlipStates.ts |
+| **Strategy**       | Diferentes estratégias de apostas.                              | ❌        | ✅       | bet_service.py |
+| **Command**        | Registrar apostas e jogadas.                                    | ❌        | ✅       | register_bet em bet_service.py |
+| **Observer**       | Notificar jogadores dos resultados.                             | Parcial   | Parcial  | update_balance, render condicional |
 
 ## 🛠️ Como Rodar o Projeto
 

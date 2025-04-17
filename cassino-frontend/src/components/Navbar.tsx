@@ -25,7 +25,9 @@ const Navbar: React.FC = () => {
       </div>
       <div className="saldo">
         💰 Saldo: ${balance.toFixed(2)}{" "}
-        <button onClick={handleLogout}>Trocar Perfil</button>
+        <button className="logout-button" onClick={handleLogout}>
+          Trocar Perfil
+        </button>
       </div>
     </nav>
   );

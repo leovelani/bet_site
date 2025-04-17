@@ -1,13 +1,15 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import GameContext from "../../context/GameContext";
-import "./CoinFlip.css"; // Importando os estilos
+import "./CoinFlip.css";
 import api from "../../services/api";
+import { useGameState } from "../../hooks/useGameState";
+import { IdleState, PlayingState, ResultState } from "../../hooks/CoinFlipStates";
 
 const CoinFlip: React.FC = () => {
-  const [betAmount, setBetAmount] = useState<number>(10); 
-  const [betChoice, setBetChoice] = useState<string>("cara"); 
-  const [result, setResult] = useState<string | null>(null);
-  const [isFlipping, setIsFlipping] = useState(false);
+  const [betAmount, setBetAmount] = useState<number>(10);
+  const [betChoice, setBetChoice] = useState<string>("cara");
+
+  const { state, setState } = useGameState();
 
   const gameContext = useContext(GameContext);
   if (!gameContext) return null;
@@ -18,42 +20,39 @@ const CoinFlip: React.FC = () => {
       alert("Saldo insuficiente!");
       return;
     }
-  
-    setIsFlipping(true);
-  
+
+    const username = localStorage.getItem("username");
+    if (!username) {
+      alert("Usuário não logado!");
+      return;
+    }
+
+    setState(new PlayingState());
+
     try {
-      const username = localStorage.getItem("username");
-      if (!username) {
-        alert("Usuário não logado!");
-        return;
-      }
-  
       const response = await api.post("/bet/bet/coinflip", null, {
         params: {
           amount: betAmount,
           choice: betChoice.toLowerCase(),
           nome: username,
+          multiplier: 2,
         },
       });
-  
+
       const data = response.data;
-      setResult(data.resultado);
-  
+
       setTimeout(() => {
+        setState(new ResultState(data.resultado, data.ganhou));
         setBalance(data.new_balance);
         localStorage.setItem("balance", String(data.new_balance));
-      }, 2000);
-  
+      }, 2000); // tempo da animação
+
     } catch (error) {
       alert("Erro ao processar aposta");
       console.error(error);
-    } finally {
-      setTimeout(() => {
-        setIsFlipping(false); 
-      }, 2000);
+      setState(new IdleState());
     }
   };
-  
 
   return (
     <div className="coinflip-page">
@@ -73,21 +72,31 @@ const CoinFlip: React.FC = () => {
 
         <label>
           Escolha:
-          <select value={betChoice} onChange={(e) => setBetChoice(e.target.value)}>
+          <select
+            value={betChoice}
+            onChange={(e) => setBetChoice(e.target.value)}
+          >
             <option value="cara">Cara</option>
             <option value="coroa">Coroa</option>
           </select>
         </label>
       </div>
 
-      {/* Animação da Moeda */}
       <div className="coin-container">
-        <div className={`coin ${isFlipping ? "flip" : ""}`}>
-          {result || "?"}
+        <div className={`coin ${state instanceof PlayingState ? "flip" : ""}`}>
+          {state instanceof ResultState ? state.resultado : "?"}
         </div>
       </div>
 
-      <button onClick={handlePlay} disabled={isFlipping}>Jogar</button>
+      <button onClick={handlePlay} disabled={state instanceof PlayingState}>
+        Jogar
+      </button>
+
+      {state instanceof ResultState && (
+        <div className={`resultado ${state.ganhou ? "ganhou" : "perdeu"}`}>
+          {state.ganhou ? "Você ganhou!" : "Você perdeu!"}
+        </div>
+      )}
     </div>
   );
 };
