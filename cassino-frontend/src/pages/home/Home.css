@@ -1,15 +1,16 @@
 .home-container {
     position: relative;
     z-index: 1;
-    background: url("/public/images/background_home.jpg") no-repeat center center fixed;
+    background: url("/public/images/fundo_urubu.png") no-repeat center center fixed;
     background-size: cover;
-    height: 75.5vh;
+    min-height: 100vh;
+    width: 100%;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: 200px;
+    padding-top: 120px;
     color: white;
     text-shadow: 1px 1px 4px #000;
     overflow: hidden;
@@ -45,4 +46,63 @@
 .home-container h1,
 .home-container p {
     text-shadow: 6px 6px 10px rgba(0, 0, 0, 8);
+}
+
+.games-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 50px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+}
+
+.game-card {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    width: 250px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    border-color: #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.game-card h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #ffd700;
+}
+
+.game-card p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+.game-card button {
+    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.game-card button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
 }

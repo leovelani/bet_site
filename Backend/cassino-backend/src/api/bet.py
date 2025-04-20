@@ -9,7 +9,7 @@ from src.services.bet_service import register_bet
 from src.services.user_service import get_user_by_username
 import random
 
-router = APIRouter()
+router = APIRouter(prefix="/bet")
 
 async def get_db():
     db = AsyncSessionLocal()
@@ -28,9 +28,9 @@ async def list_bets(db: AsyncSession = Depends(get_db)):
     return [bet.__dict__ for bet in bets]
 
 
-@router.post("/bet/coinflip")
-async def coinflip( amount: float, choice: str,nome:str,multiplier:int ,db: AsyncSession = Depends(get_db)):
-    user = await get_user_by_username(db,nome)
+@router.post("/coinflip")
+async def coinflip(amount: float, choice: str, nome: str, multiplier: int, db: AsyncSession = Depends(get_db)):
+    user = await get_user_by_username(db, nome)
     user_id = user.id
     if choice not in ["cara", "coroa"]:
         return {"erro": "Escolha 'cara' ou 'coroa'"}
@@ -50,11 +50,11 @@ async def coinflip( amount: float, choice: str,nome:str,multiplier:int ,db: Asyn
 
     return {"resultado": resultado, "ganhou": won, "new_balance": new_balance}
 
-@router.post("/bet/roleta")
-async def roleta(nome:str, amount: float, choice: int,multiplier: int ,db: AsyncSession = Depends(get_db)):
-    import random
-    user = await get_user_by_username(db,nome)
+@router.post("/roleta")
+async def roleta(amount: float, choice: int, nome: str, multiplier: int, db: AsyncSession = Depends(get_db)):
+    user = await get_user_by_username(db, nome)
     user_id = user.id
+    
     # Validação do número escolhido
     if not (1 <= choice <= 36):
         return {"erro": "Escolha um número entre 1 e 36"}
@@ -68,7 +68,7 @@ async def roleta(nome:str, amount: float, choice: int,multiplier: int ,db: Async
     resultado = random.randint(1, 36)
     won = choice == resultado
 
-    # Se ganhou, dobra o valor apostado
+    # Se ganhou, multiplica o valor apostado
     if won:
         new_balance = await update_balance(db, user_id, amount * multiplier)
         await register_bet(db, user_id, "roleta", amount, "win")
