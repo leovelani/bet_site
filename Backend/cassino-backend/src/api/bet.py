@@ -60,7 +60,7 @@ async def roleta(amount: float, choice: int, nome: str, multiplier: int, db: Asy
         return {"erro": "Escolha um número entre 1 e 36"}
 
     # Desconta saldo
-    new_balance = await update_balance(db, user_id, -amount)
+    new_balance = await update_balance(db, user_id, -amount * multiplier)
     if new_balance is None:
         return {"erro": "Saldo insuficiente"}
 
@@ -70,7 +70,7 @@ async def roleta(amount: float, choice: int, nome: str, multiplier: int, db: Asy
 
     # Se ganhou, multiplica o valor apostado
     if won:
-        new_balance = await update_balance(db, user_id, amount * multiplier)
+        new_balance = await update_balance(db, user_id, amount * multiplier * 2)
         await register_bet(db, user_id, "roleta", amount, "win")
     else:
         await register_bet(db, user_id, "roleta", amount, "lose")
