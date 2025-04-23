@@ -20,8 +20,9 @@ async def get_db():
 
 
 @router.get("/bets")
-async def list_bets(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Bet))  
+async def list_bets(user_id:int,db: AsyncSession = Depends(get_db)):
+#    result = await db.execute(select(Bet))  
+    result = await db.execute(select(Bet).filter(Bet.user_id == user_id))
     bets = result.scalars().all()  
 
     # 🟢 Transformar os objetos SQLAlchemy em dicionários serializáveis
@@ -35,7 +36,7 @@ async def coinflip(amount: float, choice: str, nome: str, multiplier: int, db: A
     if choice not in ["cara", "coroa"]:
         return {"erro": "Escolha 'cara' ou 'coroa'"}
 
-    new_balance = await update_balance(db, user_id, -amount)
+    new_balance = await update_balance(db, user_id, -amount * multiplier)
     if new_balance is None:
         return {"erro": "Saldo insuficiente"}
 
@@ -43,7 +44,7 @@ async def coinflip(amount: float, choice: str, nome: str, multiplier: int, db: A
     won = choice == resultado
 
     if won:
-        new_balance = await update_balance(db, user_id, amount * multiplier)
+        new_balance = await update_balance(db, user_id, amount * multiplier * 2)
         await register_bet(db, user_id, "coinflip", amount, "win")
     else:
         await register_bet(db, user_id, "coinflip", amount, "lose")
