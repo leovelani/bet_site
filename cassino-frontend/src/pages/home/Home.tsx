@@ -23,9 +23,9 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container">
-      <h1>🎰 Bem-vindo ao Cassino Virtual!</h1>
-      <p>Olá, <strong>{username}</strong>! Escolha um dos jogos no menu acima e teste sua sorte!</p>
-      <p>Você pode apostar em Coin Flip ou Roleta.</p>
+      <h1 style={{textShadow: '2px 2px 4px #000', color: '#FFD700'}}>🎰 Bem-vindo ao Urubu da Bet!</h1>
+      <p style={{fontWeight: 'bold'}}>Olá, <strong>{username}</strong>! Escolha um dos jogos no menu e teste sua sorte!</p>
+      <p style={{fontWeight: 'bold'}}>Você pode apostar em Coin Flip ou Roleta.</p>
 
       <div className="games-container">
         <div className="game-card" onClick={() => handleGameClick("/coinflip")}>

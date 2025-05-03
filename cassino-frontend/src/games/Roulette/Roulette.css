@@ -96,17 +96,18 @@
 }
 
 .roulette-wheel {
-  width: 300px;
-  height: 300px;
-  margin: 20px 0;
+  width: 500px;
+  height: 500px;
+  margin: 30px 0;
   position: relative;
   background: linear-gradient(135deg, #2c3e50, #1a252f);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  border: 5px solid gold;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.7),
+              inset 0 0 50px rgba(0, 0, 0, 0.5);
+  border: 8px solid gold;
   overflow: hidden;
 }
 
@@ -119,6 +120,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-origin: center center;
 }
 
 .wheel::before {
@@ -128,17 +130,17 @@
   height: 100%;
   background: repeating-conic-gradient(
     from 0deg,
-    #fff 0deg 10deg,
-    #000 10deg 20deg
+    rgba(255, 255, 255, 0.9) 0deg 5deg,
+    rgba(0, 0, 0, 0.9) 5deg 10deg
   );
   border-radius: 50%;
-  animation: spin 5s cubic-bezier(0.17, 0.67, 0.83, 0.67) infinite;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  animation: none;
+  opacity: 1;
+  transition: transform 5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
 }
 
 .wheel.spinning::before {
-  opacity: 1;
+  animation: spin 5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
 }
 
 @keyframes spin {
@@ -150,24 +152,90 @@
   }
 }
 
+.wheel-pointer {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-top: 40px solid gold;
+  z-index: 3;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+}
+
+.wheel-numbers {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.wheel-number {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.wheel-number.red {
+  color: #ff4d4d;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+}
+
+.wheel-number.black {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.wheel-number.green {
+  color: #4dff4d;
+  text-shadow: 0 0 10px rgba(77, 255, 77, 0.5);
+}
+
 .result-number {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   color: white;
   font-weight: bold;
-  font-size: 32px;
+  font-size: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  border: 3px solid gold;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+  border: 5px solid gold;
   z-index: 2;
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out, glowPulse 2s infinite;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.9) 100%);
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  }
 }
 
 button {
@@ -234,4 +302,43 @@ button:disabled {
   border-radius: 5px;
   margin: 0 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.roulette-track {
+  display: flex;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.track-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  margin: 0 5px;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.track-number.red {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.track-number.black {
+  background: linear-gradient(135deg, #34495e, #2c3e50);
+}
+
+.track-number.green {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
 }

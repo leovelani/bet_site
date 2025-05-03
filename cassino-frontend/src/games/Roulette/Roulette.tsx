@@ -38,14 +38,23 @@ const Roulette: React.FC = () => {
     setShowResult(false);
 
     try {
-      const response = await api.post("/bet/roleta", null, {
+      console.log("Enviando aposta:", {
+        amount: betAmount,
+        choice: selectedNumber,
+        nome: username,
+        multiplier: 36
+      });
+
+      const response = await api.post("/bet/bet/roleta", null, {
         params: {
-          amount: betAmount,
-          choice: selectedNumber,
+          amount: Number(betAmount),
+          choice: Number(selectedNumber),
           nome: username,
           multiplier: 36
         },
       });
+
+      console.log("Resposta do servidor:", response.data);
 
       const data = response.data;
 
@@ -65,16 +74,54 @@ const Roulette: React.FC = () => {
         setShowResult(true);
       }, 5000);
 
-    } catch (error) {
-      alert("Erro ao processar aposta");
-      console.error(error);
+    } catch (error: any) {
+      console.error("Erro detalhado:", error.response?.data || error.message);
+      alert("Erro ao processar aposta: " + (error.response?.data?.detail || error.message));
       setIsSpinning(false);
     }
   };
 
   const getNumberColor = (number: number): string => {
     if (number === 0) return "green";
-    return number % 2 === 0 ? "red" : "blue";
+    return number % 2 === 0 ? "red" : "black";
+  };
+
+  const renderWheelNumbers = () => {
+    const numbers = Array.from({ length: 37 }, (_, i) => i);
+    return numbers.map((number) => {
+      const angle = (number * 360) / 37;
+      const radius = 200;
+      const x = Math.cos((angle * Math.PI) / 180) * radius;
+      const y = Math.sin((angle * Math.PI) / 180) * radius;
+      
+      return (
+        <div
+          key={number}
+          className={`wheel-number ${getNumberColor(number)}`}
+          style={{
+            transform: `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`,
+          }}
+        >
+          {number}
+        </div>
+      );
+    });
+  };
+
+  const renderTrackNumbers = () => {
+    const numbers = Array.from({ length: 37 }, (_, i) => i);
+    return (
+      <div className="roulette-track">
+        {numbers.map((number) => (
+          <div
+            key={number}
+            className={`track-number ${getNumberColor(number)}`}
+          >
+            {number}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -113,14 +160,20 @@ const Roulette: React.FC = () => {
             </span>
             <span className="color-label">
               {getNumberColor(selectedNumber) === "red" ? "Vermelho" : 
-               getNumberColor(selectedNumber) === "blue" ? "Azul" : "Verde"}
+               getNumberColor(selectedNumber) === "black" ? "Preto" : "Verde"}
             </span>
           </div>
         )}
       </div>
 
+      {renderTrackNumbers()}
+
       <div className="roulette-wheel">
+        <div className="wheel-pointer" />
         <div className={`wheel ${isSpinning ? "spinning" : ""}`}>
+          <div className="wheel-numbers">
+            {renderWheelNumbers()}
+          </div>
           {showResult && result !== null && (
             <div className={`result-number ${getNumberColor(result)}`}>
               {result}
