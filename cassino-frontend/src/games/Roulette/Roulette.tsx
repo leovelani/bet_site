@@ -1,4 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
+
+import React, { useState, useContext, useRef } from "react";
 import GameContext from "../../context/GameContext";
 import "./Roulette.css";
 import api from "../../services/api";
@@ -12,8 +13,22 @@ const Roulette: React.FC = () => {
   const [showResult, setShowResult] = useState<boolean>(false);
 
   const gameContext = useContext(GameContext);
+  const wheelRef = useRef<HTMLDivElement>(null);
+
   if (!gameContext) return null;
   const { balance, setBalance } = gameContext;
+
+  const spinWheel = (winningNumber: number) => {
+    const anglePerSlot = 360 / 37;
+    const baseRotation = 360 * 10;
+    const finalAngle = 360 - (winningNumber * anglePerSlot);
+    const totalRotation = baseRotation + finalAngle;
+
+    if (wheelRef.current) {
+      wheelRef.current.style.transition = "transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)";
+      wheelRef.current.style.transform = `rotate(${totalRotation}deg)`;
+    }
+  };
 
   const handlePlay = async () => {
     if (betAmount > balance) {
@@ -21,8 +36,8 @@ const Roulette: React.FC = () => {
       return;
     }
 
-    if (selectedNumber < 1 || selectedNumber > 36) {
-      alert("Por favor, escolha um número entre 1 e 36!");
+    if (selectedNumber < 0 || selectedNumber > 36) {
+      alert("Escolha um número entre 0 e 36");
       return;
     }
 
@@ -38,13 +53,6 @@ const Roulette: React.FC = () => {
     setShowResult(false);
 
     try {
-      console.log("Enviando aposta:", {
-        amount: betAmount,
-        choice: selectedNumber,
-        nome: username,
-        multiplier: 36
-      });
-
       const response = await api.post("/bet/bet/roleta", null, {
         params: {
           amount: Number(betAmount),
@@ -54,8 +62,6 @@ const Roulette: React.FC = () => {
         },
       });
 
-      console.log("Resposta do servidor:", response.data);
-
       const data = response.data;
 
       if (data.erro) {
@@ -64,134 +70,85 @@ const Roulette: React.FC = () => {
         return;
       }
 
-      // Aguarda 5 segundos para mostrar o resultado
+      spinWheel(data.resultado);
+
       setTimeout(() => {
-        setIsSpinning(false);
+        const won = data.resultado === selectedNumber;
         setResult(data.resultado);
-        setWin(data.ganhou);
+        setWin(won);
         setBalance(data.new_balance);
         localStorage.setItem("balance", String(data.new_balance));
         setShowResult(true);
-      }, 5000);
+        setIsSpinning(false);
+      }, 5200);
 
-    } catch (error: any) {
-      console.error("Erro detalhado:", error.response?.data || error.message);
-      alert("Erro ao processar aposta: " + (error.response?.data?.detail || error.message));
+    } catch (err: any) {
+      alert("Erro ao processar aposta: " + (err.response?.data?.detail || err.message));
       setIsSpinning(false);
     }
   };
 
-  const getNumberColor = (number: number): string => {
-    if (number === 0) return "green";
-    return number % 2 === 0 ? "red" : "black";
-  };
-
-  const renderWheelNumbers = () => {
+  const renderNumbers = () => {
     const numbers = Array.from({ length: 37 }, (_, i) => i);
-    return numbers.map((number) => {
-      const angle = (number * 360) / 37;
-      const radius = 200;
-      const x = Math.cos((angle * Math.PI) / 180) * radius;
-      const y = Math.sin((angle * Math.PI) / 180) * radius;
-      
+    const anglePerSlot = 360 / 37;
+
+    return numbers.map((num, index) => {
+      const angle = index * anglePerSlot;
       return (
         <div
-          key={number}
-          className={`wheel-number ${getNumberColor(number)}`}
+          key={num}
+          className="number-slice"
           style={{
-            transform: `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`,
+            transform: `rotate(${angle}deg) translate(0, -50%)`,
           }}
         >
-          {number}
+          <span>{num}</span>
         </div>
       );
     });
   };
 
-  const renderTrackNumbers = () => {
-    const numbers = Array.from({ length: 37 }, (_, i) => i);
-    return (
-      <div className="roulette-track">
-        {numbers.map((number) => (
-          <div
-            key={number}
-            className={`track-number ${getNumberColor(number)}`}
-          >
-            {number}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
-    <div className="roulette-page">
+    <div className="roulette-pizza-page">
       <h2>Roleta</h2>
 
       <div className="bet-options">
         <label>
-          Valor da Aposta
+          Valor da Aposta:
           <input
             type="number"
             value={betAmount}
             onChange={(e) => setBetAmount(Number(e.target.value))}
             min="1"
             max={balance}
-            placeholder="Digite o valor"
           />
         </label>
 
         <label>
-          Escolha um número
+          Escolha um número:
           <input
             type="number"
             value={selectedNumber}
             onChange={(e) => setSelectedNumber(Number(e.target.value))}
-            min="1"
+            min="0"
             max="36"
-            placeholder="1-36"
           />
         </label>
-
-        {selectedNumber !== null && selectedNumber !== 0 && (
-          <div className="number-preview">
-            <span className={`number ${getNumberColor(selectedNumber)}`}>
-              {selectedNumber}
-            </span>
-            <span className="color-label">
-              {getNumberColor(selectedNumber) === "red" ? "Vermelho" : 
-               getNumberColor(selectedNumber) === "black" ? "Preto" : "Verde"}
-            </span>
-          </div>
-        )}
       </div>
 
-      {renderTrackNumbers()}
-
-      <div className="roulette-wheel">
-        <div className="wheel-pointer" />
-        <div className={`wheel ${isSpinning ? "spinning" : ""}`}>
-          <div className="wheel-numbers">
-            {renderWheelNumbers()}
-          </div>
-          {showResult && result !== null && (
-            <div className={`result-number ${getNumberColor(result)}`}>
-              {result}
-            </div>
-          )}
+      <div className="pizza-container">
+        <div className="wheel" ref={wheelRef}>
+          {renderNumbers()}
         </div>
       </div>
 
-      <button 
-        onClick={handlePlay} 
-        disabled={isSpinning || selectedNumber === 0}
-      >
+      <button onClick={handlePlay} disabled={isSpinning}>
         {isSpinning ? "Girando..." : "Girar Roleta"}
       </button>
 
       {showResult && result !== null && (
         <div className={`resultado ${win ? "ganhou" : "perdeu"}`}>
-          <p>Número sorteado: <span className={getNumberColor(result)}>{result}</span></p>
+          <p>Número sorteado: <strong>{result}</strong></p>
           <p>{win ? "Você ganhou!" : "Você perdeu!"}</p>
           {win && <p>Prêmio: ${betAmount * 36}</p>}
         </div>
