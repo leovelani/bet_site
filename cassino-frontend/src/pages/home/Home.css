@@ -1,108 +1,166 @@
+/* Home.css */
+
 .home-container {
-    position: relative;
-    z-index: 1;
-    background: url("/public/images/fundo_urubu.png") no-repeat center center fixed;
-    background-size: cover;
-    min-height: 100vh;
+    position: relative; 
+    
+    /* REMOVA a linha background-image daqui, pois será aplicada via style inline no Home.tsx */
+    /* background-image: url(...); */ 
+    
+    background-repeat: no-repeat;
+    background-position: center center; 
+    background-size: cover; 
+    background-attachment: fixed; 
+    
     width: 100%;
-    text-align: center;
+    min-height: 100%; 
+    flex-grow: 1; 
+    
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 80px;
+    align-items: center; 
+    justify-content: center; 
+    
+    padding: 40px 20px; 
+    box-sizing: border-box; 
+    
     color: white;
-    text-shadow: 1px 1px 4px #000;
-    overflow: hidden;
-}
-
-.home-container::before {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); 
+    overflow: hidden; 
+  }
+  
+  /* Overlay para melhorar o contraste do texto sobre a imagem de fundo */
+  .home-container::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: -1;
-}
-
-.home-container h1 {
-    font-size: 40px;
-    color: #fff;
-    margin-bottom: 20px;
-}
-
-.home-container p {
-    font-family: 'Poppins', sans-serif;
-    font-size: 23px;
-    font-weight: 400;
-    color: #fff;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
-}
-
-
-.home-container h1,
-.home-container p {
-    text-shadow: 6px 6px 10px rgba(0, 0, 0, 8);
-}
-
-.games-container {
+    right: 0; 
+    bottom: 0; 
+    background-color: rgba(0, 0, 0, 0.55); 
+    z-index: 0; 
+  }
+  
+  /* Wrapper para todo o conteúdo da Home Page, para controle de z-index e largura máxima */
+  .home-content-wrapper {
+    position: relative; 
+    z-index: 1; 
     display: flex;
-    gap: 30px;
-    margin-top: 50px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 1100px; 
+  }
+  
+  .home-content-wrapper h1 {
+    font-size: clamp(2.5rem, 5vw, 3.8rem); 
+    color: #FFD700;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.3);
+  }
+  
+  .home-content-wrapper p {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(1rem, 2.5vw, 1.3rem); 
+    font-weight: 400;
+    color: #f0f0f0;
+    margin-bottom: 25px;
+    line-height: 1.65;
+    max-width: 650px; 
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9); 
+  }
+  
+  .home-content-wrapper p strong {
+    color: #FFD700;
+    font-weight: 600;
+  }
+  
+  .games-container {
+    display: flex;
+    gap: clamp(20px, 4vw, 40px); 
+    margin-top: 40px;
     justify-content: center;
+    align-items: stretch; 
     flex-wrap: wrap;
     width: 100%;
-    max-width: 1200px;
-    padding: 0 20px;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 2;
-}
-
-.game-card {
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 15px;
-    padding: 20px;
-    width: 250px;
+  }
+  
+  .game-card {
+    background: rgba(25, 25, 25, 0.7); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px; 
+    padding: 30px 25px; 
+    width: clamp(260px, 30vw, 300px); 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
     text-align: center;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
-    border: 2px solid transparent;
-}
-
-.game-card:hover {
-    transform: translateY(-5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+  }
+  
+  .game-card:hover {
+    transform: translateY(-10px) scale(1.03);
     border-color: #ffd700;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-}
-
-.game-card h3 {
-    font-size: 24px;
+    box-shadow: 0 10px 35px rgba(255, 215, 0, 0.35);
+  }
+  
+  .game-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.2rem); 
     margin-bottom: 15px;
     color: #ffd700;
-}
-
-.game-card p {
-    font-size: 16px;
-    margin-bottom: 20px;
-    color: #ddd;
-}
-
-.game-card button {
+    letter-spacing: 1px;
+  }
+  
+  .game-card p {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(0.9rem, 2vw, 1rem); 
+    margin-bottom: 30px; 
+    color: #d1d1d1; 
+    line-height: 1.5;
+    flex-grow: 1; 
+  }
+  
+  .game-card button {
     background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    color: #000;
-    font-weight: bold;
+    padding: 14px 28px; 
+    border-radius: 10px; 
+    color: #0a0a0a; 
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.game-card button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-}
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    align-self: center; 
+    width: fit-content; 
+  }
+  
+  .game-card button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.65);
+  }
+  
+  .highlight-section {
+    background-color: rgba(0,0,0,0.5);
+    padding: 30px;
+    border-radius: 10px;
+    margin-top: 40px;
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  .highlight-section h2 {
+    color: #ffd700;
+    margin-bottom: 15px;
+  }
+  
+  .highlight-section p {
+    font-size: 1.1rem;
+    color: #f0f0f0;
+  }

@@ -1,10 +1,10 @@
-import React, { useState, useContext, useRef } from "react"; // useEffect não é estritamente necessário aqui
+import React, { useState, useContext, useRef } from "react";
 import GameContext from "../../context/GameContext";
 import "./Roulette.css";
 import api from "../../services/api";
 import { IBet } from "../../utils/helpers";
 
-// Função getNumberColor (permanece a mesma)
+// Função para determinar a cor do número da roleta
 const getNumberColor = (number: number): string => {
   if (number === 0) return 'number-green';
   const redNumbers = [
@@ -16,7 +16,7 @@ const getNumberColor = (number: number): string => {
 
 const Roulette: React.FC = () => {
   const [betAmount, setBetAmount] = useState<number>(10);
-  const [selectedNumber, setSelectedNumber] = useState<number>(0);
+  const [selectedNumber, setSelectedNumber] = useState<number>(0); // Default pode ser 0
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [result, setResult] = useState<number | null>(null);
   const [win, setWin] = useState<boolean | null>(null);
@@ -24,43 +24,24 @@ const Roulette: React.FC = () => {
 
   const gameContext = useContext(GameContext);
   const wheelRef = useRef<HTMLDivElement>(null);
-  // Guarda o ângulo de rotação acumulado da roleta para garantir giros progressivos
-  const currentRotationRef = useRef<number>(0);
 
   if (!gameContext) return null;
   const { balance, setBalance } = gameContext;
 
   const spinWheel = (winningNumber: number) => {
-    if (!wheelRef.current) return;
-
     const anglePerSlot = 360 / 37; // 37 números (0-36)
-    
-    // 1. Calcula o ângulo de destino normalizado (0-359 graus) para o número vencedor.
-    //    Este é o ângulo em que a "fatia" do número vencedor deve estar alinhada com o ponteiro (topo).
-    const targetNormalizedAngle = (360 - (winningNumber * anglePerSlot) + 360) % 360;
-    
-    // 2. Define quantas voltas completas "visuais" extras queremos que a roleta dê.
-    const visualSpins = 10; // Por exemplo, 10 voltas rápidas.
+    const baseRotation = 360 * 10; // Girar várias vezes para efeito
+    // Ajuste para que o número vencedor pare no topo (ponteiro)
+    // O número 0 está na posição 0 graus. O número 1 em anglePerSlot, etc.
+    // Queremos que o winningNumber * anglePerSlot chegue a 0 graus.
+    // Então, rodamos por -(winningNumber * anglePerSlot)
+    const finalAngle = 360 - (winningNumber * anglePerSlot);
+    const totalRotation = baseRotation + finalAngle;
 
-    // 3. Calcula o ângulo visual atual da roleta (onde ela parou na última rodada, normalizado 0-359).
-    const currentVisualAngle = (currentRotationRef.current % 360 + 360) % 360;
-
-    // 4. Calcula a menor rotação para frente necessária para ir do ângulo visual atual ao ângulo de destino.
-    const deltaToReachTarget = (targetNormalizedAngle - currentVisualAngle + 360) % 360;
-
-    // 5. Calcula o novo ângulo de rotação final.
-    //    Será a rotação acumulada da rodada anterior + as voltas visuais extras + o delta para o alvo.
-    //    Isso garante que a roleta sempre gire para frente e complete as 'visualSpins'.
-    const newFinalRotation = currentRotationRef.current + (visualSpins * 360) + deltaToReachTarget;
-
-    // 6. Atualiza a referência da rotação acumulada para este novo valor final.
-    currentRotationRef.current = newFinalRotation;
-
-    // 7. Aplica a transição e a nova transformação de rotação.
-    //    Não é necessário "resetar" a transição para 'none' com esta abordagem,
-    //    pois o valor de `rotate()` está sempre aumentando, garantindo o giro contínuo.
-    wheelRef.current.style.transition = "transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)";
-    wheelRef.current.style.transform = `rotate(${newFinalRotation}deg)`;
+    if (wheelRef.current) {
+      wheelRef.current.style.transition = "transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)";
+      wheelRef.current.style.transform = `rotate(${totalRotation}deg)`;
+    }
   };
 
   const handlePlay = async () => {
@@ -94,7 +75,7 @@ const Roulette: React.FC = () => {
           amount: Number(betAmount),
           choice: Number(selectedNumber),
           nome: username,
-          multiplier: 36,
+          multiplier: 36, // Este multiplicador é o padrão para aposta em número único
         },
       });
 
@@ -116,7 +97,7 @@ const Roulette: React.FC = () => {
         localStorage.setItem("balance", String(data.new_balance));
         setShowResult(true);
         setIsSpinning(false);
-      }, 5200);
+      }, 5200); // Tempo deve ser um pouco maior que a transição do CSS (5s)
 
     } catch (err: any) {
       alert("Erro ao processar aposta: " + (err.response?.data?.detail || err.message));
@@ -125,32 +106,35 @@ const Roulette: React.FC = () => {
   };
 
   const renderNumbers = () => {
-    const numbers = Array.from({ length: 37 }, (_, i) => i);
+    const numbers = Array.from({ length: 37 }, (_, i) => i); // 0 a 36
     const anglePerSlot = 360 / 37;
-    const radius = 175;
+    const radius = 175; // Raio para posicionar os números (centro do círculo do número)
 
     return numbers.map((num, index) => {
-      const angle = index * anglePerSlot;
+      const angle = index * anglePerSlot; // Ângulo em graus
       const colorClass = getNumberColor(num);
 
       return (
         <div
           key={num}
-          className="number-container"
+          className="number-container" // Container para cada número, usado para rotação
           style={{
             position: 'absolute',
-            left: '50%',
-            top: '50%',
-            width: '1px',
+            left: '50%', // Centro da roleta
+            top: '50%',   // Centro da roleta
+            width: '1px', // Apenas um ponto de origem para a transformação
             height: '1px',
-            transform: `rotate(${angle}deg)`,
+            transform: `rotate(${angle}deg)`, // Rotaciona o "braço" onde o número senta
           }}
         >
           <div
-            className={`number-display ${colorClass}`}
+            className={`number-display ${colorClass}`} // O círculo visual do número
             style={{
               position: 'absolute',
+              // Move o número para fora ao longo do "braço" rotacionado
+              // translate(-50%, -radius) centraliza o número e o empurra para a borda
               transform: `translate(-50%, -${radius}px)`,
+              // Os números vão girar com a roleta, mantendo sua orientação relativa à roleta
             }}
           >
             {num}
@@ -163,6 +147,7 @@ const Roulette: React.FC = () => {
   return (
     <div className="roulette-pizza-page">
       <h2>Roleta</h2>
+
       <div className="bet-options">
         <label>
           Valor da Aposta:
@@ -180,20 +165,23 @@ const Roulette: React.FC = () => {
             type="number"
             value={selectedNumber}
             onChange={(e) => setSelectedNumber(Number(e.target.value))}
-            min="0"
+            min="0" // Alterado para permitir 0
             max="36"
           />
         </label>
       </div>
+
       <div className="pizza-container">
-        <div className="pointer"></div>
+        <div className="pointer"></div> {/* Ponteiro adicionado aqui */}
         <div className="wheel" ref={wheelRef}>
           {renderNumbers()}
         </div>
       </div>
+
       <button onClick={handlePlay} disabled={isSpinning}>
         {isSpinning ? "Girando..." : "Girar Roleta"}
       </button>
+
       {showResult && result !== null && (
         <div className={`resultado ${win ? "ganhou" : "perdeu"}`}>
           <p>Número sorteado: <strong>{result}</strong></p>
@@ -205,6 +193,7 @@ const Roulette: React.FC = () => {
   );
 };
 
+// Classe de aposta para Roleta
 export class RouletteBet implements IBet {
   amount: number;
   choice: number;

@@ -1,14 +1,24 @@
+/* Index.css */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600&display=swap');
 
-body {
+html, body, #root {
+  height: 100%;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: 'Bebas+Neue', sans-serif;
-  
+  background-color: #111; /* Cor de fundo padrão do corpo da página */
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 code {
