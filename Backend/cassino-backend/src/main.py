@@ -23,7 +23,6 @@ async def close_db_connection():
 
 app = FastAPI(lifespan=lifespan)
 
-# ✅ Adicionando o Middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Permite todas as origens (use domínios específicos em produção)

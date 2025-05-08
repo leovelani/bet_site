@@ -37,34 +37,54 @@ required_defeats = random.randint(2, 10) # Número de "derrotas" do sistema ante
 @router.post("/coinflip")
 async def coinflip(amount: float, choice: str, nome: str, multiplier: int, db: AsyncSession = Depends(get_db)):
     global coinflip_victory_count, defeat_count, required_defeats
-    # ... (código de busca de usuário, validação de saldo) ...
+    try:
+        # Buscar o usuário
+        user = await get_user_by_username(db, nome)
+        user_id = user.id
 
-    # Lógica viciada
-    if coinflip_victory_count >= 1: # Se o sistema "ganhou" na última vez (ou seja, o jogador anterior PERDEU de forma forçada ou o sistema ganhou aleatoriamente)
-        # Forçar derrota para o jogador atual
-        resultado = "cara" if choice == "coroa" else "coroa" # Define o resultado oposto à escolha do jogador
-        won = False
-        coinflip_victory_count = 0 # Reseta a contagem de "vitórias" do sistema
-        defeat_count += 1          # Incrementa a contagem de "derrotas" do sistema (que na verdade é uma vitória para o jogador)
-    elif defeat_count >= required_defeats: # Se o sistema "perdeu" o número necessário de vezes
-        # Forçar vitória para o jogador atual
-        resultado = choice # Define o resultado como a escolha do jogador
-        won = True
-        defeat_count = 0           # Reseta a contagem de "derrotas" do sistema
-        coinflip_victory_count += 1 # Incrementa a contagem de "vitórias" do sistema (que é uma derrota para o jogador)
-        required_defeats = random.randint(2, 10)  # Redefine o número de "derrotas" necessárias para a próxima "vitória" forçada do sistema
-    else:
-        # Sorteia resultado do coinflip (aleatório, mas alimenta o sistema viciado)
-        resultado = random.choice(["cara", "coroa"])
-        won = choice == resultado # Verifica se o jogador ganhou
-        if won:
-            coinflip_victory_count += 1 # Se o jogador ganhou (sistema "perdeu")
-            defeat_count = 0           # Reseta contagem de "derrotas" do sistema
+        # Descontar saldo
+        new_balance = await update_balance(db, user_id, -amount)
+        if new_balance is None:
+            return {"erro": "Saldo insuficiente"}
+
+        # Lógica viciada
+        if coinflip_victory_count >= 1:
+            resultado = "cara" if choice == "coroa" else "coroa"
+            won = False
+            coinflip_victory_count = 0
+            defeat_count += 1
+        elif defeat_count >= required_defeats:
+            resultado = choice
+            won = True
+            defeat_count = 0
+            coinflip_victory_count += 1
+            required_defeats = random.randint(2, 10)
         else:
-            defeat_count += 1          # Se o jogador perdeu (sistema "ganhou")
+            resultado = random.choice(["cara", "coroa"])
+            won = (choice == resultado)
+            if won:
+                coinflip_victory_count += 1
+                defeat_count = 0
+            else:
+                defeat_count += 1
 
-    # ... (código de atualização de saldo e registro da aposta) ...
-    return {"resultado": resultado, "ganhou": won, "new_balance": new_balance}
+        # Se ganhou, atualizar saldo com o prêmio
+        if won:
+            new_balance = await update_balance(db, user_id, amount * multiplier)
+            await register_bet(db, user_id, "coinflip", amount, "win")
+        else:
+            await register_bet(db, user_id, "coinflip", amount, "lose")
+
+        return {
+            "resultado": resultado,
+            "ganhou": won,
+            "new_balance": new_balance
+        }
+
+    except Exception as e:
+        print("❌ ERRO NO COINFLIP:", e)
+        return {"erro": "Erro interno no servidor"}
+
 
 # Adicionar contadores de vitórias e derrotas
 victory_count = 0

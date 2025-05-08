@@ -34,14 +34,14 @@ const CoinFlip: React.FC = () => {
       const lastBet = new CoinFlipBet(betAmount, betChoice, username, 2);
       const betCopy = lastBet.clone();
 
-      const response = await api.post("/bet/bet/coinflip", null, {
+      const response = await api.post("bet/bet/coinflip", null, {
         params: {
           amount: betCopy.amount,
           choice: betCopy.choice,
           nome: betCopy.username,
           multiplier: betCopy.multiplier,
         },
-      });
+      });      
 
       const data = response.data;
 
