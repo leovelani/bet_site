@@ -39,9 +39,17 @@ const Roulette: React.FC = () => {
     const totalRotation = baseRotation + finalAngle;
 
     if (wheelRef.current) {
-      wheelRef.current.style.transition = "transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)";
-      wheelRef.current.style.transform = `rotate(${totalRotation}deg)`;
+      // Reset imediato (sem transição)
+      wheelRef.current.style.transition = "none";
+      wheelRef.current.style.transform = `rotate(0deg)`;
+    
+      // Aguarda um pequeno tempo para garantir que o reset seja aplicado
+      setTimeout(() => {
+        wheelRef.current!.style.transition = "transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)";
+        wheelRef.current!.style.transform = `rotate(${totalRotation}deg)`;
+      }, 50); // pequeno delay para garantir que o reset foi reconhecido
     }
+    
   };
 
   const handlePlay = async () => {
