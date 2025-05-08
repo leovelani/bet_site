@@ -24,7 +24,7 @@ Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, util
 
 | Padrão GoF       | Objetivo                                                         | Frontend | Backend | Arquivo(s) Relacionado(s) |
 |------------------|------------------------------------------------------------------|----------|---------|-----------------------------|
-| **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta).                      | ✅        | ✅       | GameFactory.tsx, bet_service.py |
+| **Factory Method** | Criar diferentes jogos (Coin Flip, Roleta).                      | ❌        | ❌       |  |
 | **Singleton**      | Garantir uma única instância de um objeto.                      | ❌        | ✅       | database.py |
 | **Prototype**      | Duplicar apostas sem recriar objetos manualmente.               | ✅        | ❌       | — helper.ts / roulette.tsx / coinflip.tsx|
 | **Bridge**         | Separar a lógica dos jogos do frontend.                         | ✅        | ❌       | useGameState.ts, CoinFlipStates.ts  |
