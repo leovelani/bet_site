@@ -1,143 +1,205 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException
+# from sqlalchemy.orm import Session # Não usado com AsyncSession
 from src.models.database import AsyncSessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from src.models.bet import Bet
-from src.services.balance import update_balance
+from src.models.user import User # Certifique-se que este import está correto e User é seu modelo SQLAlchemy
+# VERIFIQUE O NOME DESTE ARQUIVO/FUNÇÃO - balance_service.py ou balance.py?
+from src.services.balance_service import update_balance 
 from src.services.bet_service import register_bet
 from src.services.user_service import get_user_by_username
 import random
+import logging 
 
-router = APIRouter(prefix="/bet")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/bet") # O prefixo /bet já está aqui
 
 async def get_db():
-    db = AsyncSessionLocal()
+    # Certifique-se que AsyncSessionLocal está configurado corretamente em database.py
+    db = AsyncSessionLocal() 
     try:
         yield db
     finally:
-       await db.close()
+        await db.close()
 
 
-@router.get("/bets")
-async def list_bets(user_id:int,db: AsyncSession = Depends(get_db)):
-#    result = await db.execute(select(Bet))  
-    result = await db.execute(select(Bet).filter(Bet.user_id == user_id))
-    bets = result.scalars().all()  
+@router.get("/bets", name="list_user_bets") 
+async def list_bets(user_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await db.execute(select(Bet).filter(Bet.user_id == user_id))
+        bets_result = result.scalars().all()
+        bets_list = []
+        for bet_obj in bets_result:
+            # Serialização simples
+            bet_data = {c.name: getattr(bet_obj, c.name) for c in bet_obj.__table__.columns}
+            bets_list.append(bet_data)
+        logger.info(f"Listando apostas para user_id {user_id}. Encontradas: {len(bets_list)}")
+        return bets_list
+    except Exception as e:
+        logger.error(f"Erro ao listar apostas para user_id {user_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Erro interno ao buscar apostas.")
 
-    # 🟢 Transformar os objetos SQLAlchemy em dicionários serializáveis
-    return [bet.__dict__ for bet in bets]
 
+# --- Contadores Globais (Mantenha se for intencional) ---
+# CoinFlip
+coinflip_global_victory_count = 0 
+coinflip_global_defeat_count = 0  
+coinflip_global_required_defeats = random.randint(2, 10)
+# Roleta
+roleta_global_victory_count = 0
+roleta_global_defeat_count = 0
+roleta_global_required_defeats = random.randint(2, 10) 
 
-# Adicionar contadores de vitórias e derrotas para o CoinFlip
-coinflip_victory_count = 0  # Quantas vezes o sistema "ganhou" recentemente
-defeat_count = 0          # Quantas vezes o sistema "perdeu" recentemente
-required_defeats = random.randint(2, 10) # Número de "derrotas" do sistema antes de uma "vitória" forçada do sistema
-
-@router.post("/coinflip")
-async def coinflip(amount: float, choice: str, nome: str, multiplier: int, db: AsyncSession = Depends(get_db)):
-    global coinflip_victory_count, defeat_count, required_defeats
-    # ... (código de busca de usuário, validação de saldo) ...
-
-    # Lógica viciada
-    if coinflip_victory_count >= 1: # Se o sistema "ganhou" na última vez (ou seja, o jogador anterior PERDEU de forma forçada ou o sistema ganhou aleatoriamente)
-        # Forçar derrota para o jogador atual
-        resultado = "cara" if choice == "coroa" else "coroa" # Define o resultado oposto à escolha do jogador
-        won = False
-        coinflip_victory_count = 0 # Reseta a contagem de "vitórias" do sistema
-        defeat_count += 1          # Incrementa a contagem de "derrotas" do sistema (que na verdade é uma vitória para o jogador)
-    elif defeat_count >= required_defeats: # Se o sistema "perdeu" o número necessário de vezes
-        # Forçar vitória para o jogador atual
-        resultado = choice # Define o resultado como a escolha do jogador
-        won = True
-        defeat_count = 0           # Reseta a contagem de "derrotas" do sistema
-        coinflip_victory_count += 1 # Incrementa a contagem de "vitórias" do sistema (que é uma derrota para o jogador)
-        required_defeats = random.randint(2, 10)  # Redefine o número de "derrotas" necessárias para a próxima "vitória" forçada do sistema
-    else:
-        # Sorteia resultado do coinflip (aleatório, mas alimenta o sistema viciado)
-        resultado = random.choice(["cara", "coroa"])
-        won = choice == resultado # Verifica se o jogador ganhou
-        if won:
-            coinflip_victory_count += 1 # Se o jogador ganhou (sistema "perdeu")
-            defeat_count = 0           # Reseta contagem de "derrotas" do sistema
-        else:
-            defeat_count += 1          # Se o jogador perdeu (sistema "ganhou")
-
-    # ... (código de atualização de saldo e registro da aposta) ...
-    return {"resultado": resultado, "ganhou": won, "new_balance": new_balance}
-
-# Adicionar contadores de vitórias e derrotas
-victory_count = 0
-defeat_count = 0
-
-@router.post("/roleta")
-async def roleta(amount: float, choice: int, nome: str, multiplier: int, db: AsyncSession = Depends(get_db)):
-    # Declara que estamos usando as variáveis globais definidas fora desta função.
-    global victory_count, defeat_count, required_defeats
+@router.post("/coinflip", name="coinflip_bet") 
+async def coinflip_bet_endpoint(amount: float, choice: str, nome: str, multiplier: int, db: AsyncSession = Depends(get_db)):
+    # ===> Esta é a função onde o erro ocorria <===
+    global coinflip_global_victory_count, coinflip_global_defeat_count, coinflip_global_required_defeats
     
+    logger.info(f"CoinFlip - Recebido: Usuário={nome}, Valor={amount}, Escolha={choice}, Multiplicador={multiplier}")
+
+    # --- Busca e Validação do Usuário/Saldo ---
     user = await get_user_by_username(db, nome)
+    if not user:
+        logger.warning(f"CoinFlip - Usuário não encontrado: {nome}")
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
     user_id = user.id
-    
-    # Validação do número escolhido pelo jogador.
-    if not (1 <= choice <= 36):
-        return {"erro": "Escolha um número entre 1 e 36"}
+    current_balance = user.balance
+    logger.info(f"CoinFlip - Saldo atual {nome} (ID: {user_id}): {current_balance}")
 
-    # Desconta o valor da aposta do saldo do jogador ANTES de determinar o resultado.
-    new_balance = await update_balance(db, user_id, -amount)
-    if new_balance is None:
-        return {"erro": "Saldo insuficiente"}
+    if current_balance < amount:
+        logger.warning(f"CoinFlip - Saldo insuficiente para {nome}. Saldo: {current_balance}, Aposta: {amount}")
+        raise HTTPException(status_code=400, detail="Saldo insuficiente")
 
-    # --- INÍCIO DA LÓGICA VICIADA ---
-    
-    # CONDIÇÃO 1: FORÇAR DERROTA DO JOGADOR
-    # Se o sistema "ganhou" na última rodada controlada (victory_count >= 1),
-    # ele força o jogador atual a perder.
-    if victory_count >= 1:
-        # Garante que o resultado seja DIFERENTE da escolha do jogador.
-        # Cria uma lista de todos os números possíveis (1 a 36) exceto o número que o jogador escolheu.
-        # Em seguida, sorteia um número dessa lista.
-        resultado = random.choice([i for i in range(1, 37) if i != choice])
-        won = False  # Jogador perdeu.
-        victory_count = 0  # Reseta a contagem de "vitórias do sistema" para o próximo ciclo.
-        defeat_count += 1  # Incrementa a contagem de "derrotas do sistema" (pois o jogador perdeu).
-    
-    # CONDIÇÃO 2: FORÇAR VITÓRIA DO JOGADOR
-    # Se a CONDIÇÃO 1 não foi atendida E o sistema acumulou "derrotas" suficientes (defeat_count >= required_defeats),
-    # ele força o jogador atual a ganhar.
-    elif defeat_count >= required_defeats:
-        resultado = choice  # O resultado é exatamente o número que o jogador escolheu.
-        won = True  # Jogador ganhou.
-        defeat_count = 0  # Reseta a contagem de "derrotas do sistema".
-        victory_count += 1  # Incrementa a contagem de "vitórias do sistema" (pois o jogador ganhou, preparando uma futura derrota forçada).
-        # Define um novo número aleatório de "derrotas" que o sistema precisará acumular
-        # antes de forçar outra vitória para um jogador.
-        required_defeats = random.randint(2, 10)
-        
-    # CONDIÇÃO 3: RESULTADO "ALEATÓRIO" (MAS QUE ALIMENTA O CICLO)
-    # Se nenhuma das condições forçadas acima foi atendida, o resultado é determinado aleatoriamente.
+    # --- Lógica "Viciada" e Resultado ---
+    if coinflip_global_victory_count >= 1:
+        resultado = "cara" if choice == "coroa" else "coroa"
+        won = False
+        coinflip_global_victory_count = 0; coinflip_global_defeat_count += 1
+        logger.info("CoinFlip - Lógica: Forçando derrota.")
+    elif coinflip_global_defeat_count >= coinflip_global_required_defeats:
+        resultado = choice
+        won = True
+        coinflip_global_defeat_count = 0; coinflip_global_victory_count += 1
+        coinflip_global_required_defeats = random.randint(2, 10)
+        logger.info(f"CoinFlip - Lógica: Forçando vitória. Próximo limite: {coinflip_global_required_defeats}")
     else:
-        resultado = random.randint(1, 36)  # Sorteia um número aleatório entre 1 e 36.
-        won = choice == resultado  # Verifica se o número sorteado é o mesmo que o jogador escolheu.
+        resultado = random.choice(["cara", "coroa"])
+        won = choice == resultado
+        if won: coinflip_global_victory_count += 1; coinflip_global_defeat_count = 0
+        else: coinflip_global_defeat_count += 1
+        logger.info("CoinFlip - Lógica: Resultado aleatório.")
+    logger.info(f"CoinFlip - Resultado final: {resultado}, Ganhou: {won}")
+
+    # --- Atualização de Saldo e Registro no Banco ---
+    new_balance_variable_for_return = current_balance # Inicializa com valor conhecido
+
+    try:
+        if won:
+            net_gain = (amount * multiplier) - amount
+            # Atualiza saldo com ganho líquido
+            new_balance_variable_for_return = await update_balance(db, user_id, net_gain) 
+            await register_bet(db, user_id, "coinflip", amount, "win")
+            logger.info(f"CoinFlip - {nome} ganhou. Ganho líquido: {net_gain}.")
+        else:
+            # Atualiza saldo deduzindo a aposta
+            new_balance_variable_for_return = await update_balance(db, user_id, -amount) 
+            await register_bet(db, user_id, "coinflip", amount, "lose")
+            logger.info(f"CoinFlip - {nome} perdeu. Aposta: {amount}")
+
+        await db.commit() # Persiste as alterações
+        logger.info(f"CoinFlip - Transação comitada para aposta de {nome}.")
         
-        if won: # Se o jogador ganhou nesta rodada "aleatória":
-            victory_count += 1  # Incrementa "vitórias do sistema" (preparando para forçar derrota futura).
-            defeat_count = 0    # Reseta "derrotas do sistema".
-        else: # Se o jogador perdeu nesta rodada "aleatória":
-            defeat_count += 1   # Incrementa "derrotas do sistema" (aproximando de uma vitória forçada futura).
+        # Opcional: Recarregar usuário se update_balance não retornar o saldo comitado
+        # updated_user = await db.get(User, user_id)
+        # if updated_user: new_balance_variable_for_return = updated_user.balance
 
-    # --- FIM DA LÓGICA VICIADA ---
+    except Exception as e:
+        await db.rollback() 
+        logger.error(f"CoinFlip - Erro no processamento DB para {nome}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Erro interno ao atualizar saldo/aposta: {str(e)}")
 
-    # Se o jogador ganhou (seja de forma forçada ou aleatória),
-    # atualiza o saldo adicionando o valor ganho (aposta * multiplicador).
-    if won:
-        new_balance = await update_balance(db, user_id, amount * multiplier)
-        await register_bet(db, user_id, "roleta", amount, "win") # Registra a aposta como vitória.
+    # Garante que a variável está definida antes de retornar
+    logger.info(f"CoinFlip - Retornando saldo final para {nome}: {new_balance_variable_for_return}")
+    return {"resultado": resultado, "ganhou": won, "new_balance": new_balance_variable_for_return} 
+
+
+@router.post("/roleta", name="roleta_bet") 
+async def roleta_bet_endpoint(amount: float, choice: int, nome: str, multiplier: int, db: AsyncSession = Depends(get_db)):
+    global roleta_global_victory_count, roleta_global_defeat_count, roleta_global_required_defeats
+    
+    logger.info(f"Roleta - Recebido: Usuário={nome}, Valor={amount}, Escolha={choice}, Multiplicador={multiplier}")
+
+    # --- Busca e Validação do Usuário/Saldo ---
+    user = await get_user_by_username(db, nome)
+    if not user:
+        logger.warning(f"Roleta - Usuário não encontrado: {nome}")
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    user_id = user.id
+    current_balance = user.balance
+    logger.info(f"Roleta - Saldo atual {nome} (ID: {user_id}): {current_balance}")
+
+    if current_balance < amount:
+        logger.warning(f"Roleta - Saldo insuficiente para {nome}. Saldo: {current_balance}, Aposta: {amount}")
+        raise HTTPException(status_code=400, detail="Saldo insuficiente")
+
+    # --- Validação da Escolha (Ajuste o range 0-36 se necessário) ---
+    ROULETTE_NUMBERS = list(range(0, 37)) # Exemplo: 0 a 36
+    if choice not in ROULETTE_NUMBERS: 
+        logger.warning(f"Roleta - Escolha inválida para {nome}: {choice}")
+        raise HTTPException(status_code=400, detail="Escolha inválida para a roleta (deve ser entre 0 e 36).") 
+
+    # --- Lógica "Viciada" e Resultado ---
+    if roleta_global_victory_count >= 1:
+        possible_results = [i for i in ROULETTE_NUMBERS if i != choice] 
+        resultado = random.choice(possible_results) if possible_results else choice # Fallback
+        won = False
+        roleta_global_victory_count = 0; roleta_global_defeat_count += 1
+        logger.info("Roleta - Lógica: Forçando derrota.")
+    elif roleta_global_defeat_count >= roleta_global_required_defeats:
+        resultado = choice
+        won = True
+        roleta_global_defeat_count = 0; roleta_global_victory_count += 1
+        roleta_global_required_defeats = random.randint(2, 10)
+        logger.info(f"Roleta - Lógica: Forçando vitória. Próximo limite: {roleta_global_required_defeats}")
     else:
-        await register_bet(db, user_id, "roleta", amount, "lose") # Registra a aposta como derrota.
+        resultado = random.choice(ROULETTE_NUMBERS) 
+        won = choice == resultado
+        if won: roleta_global_victory_count += 1; roleta_global_defeat_count = 0
+        else: roleta_global_defeat_count += 1
+        logger.info("Roleta - Lógica: Resultado aleatório.")
+    logger.info(f"Roleta - Resultado final: {resultado}, Ganhou: {won}")
 
-    # Retorna o resultado para o frontend.
-    return {
-        "resultado": resultado,
-        "ganhou": won,
-        "new_balance": new_balance
-    }
+    # --- Atualização de Saldo e Registro no Banco ---
+    new_balance_variable_for_return = current_balance # Inicializa
+
+    try:
+        if won:
+            net_gain = (amount * multiplier) - amount
+            new_balance_variable_for_return = await update_balance(db, user_id, net_gain)
+            await register_bet(db, user_id, "roleta", amount, "win")
+            logger.info(f"Roleta - {nome} ganhou. Ganho líquido: {net_gain}.")
+        else:
+            new_balance_variable_for_return = await update_balance(db, user_id, -amount)
+            await register_bet(db, user_id, "roleta", amount, "lose")
+            logger.info(f"Roleta - {nome} perdeu. Aposta: {amount}")
+        
+        await db.commit()
+        logger.info(f"Roleta - Transação comitada para aposta de {nome}.")
+
+        # Opcional: Recarregar usuário
+        # updated_user = await db.get(User, user_id)
+        # if updated_user: new_balance_variable_for_return = updated_user.balance
+
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Roleta - Erro no processamento DB para {nome}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Erro interno ao atualizar saldo/aposta Roleta: {str(e)}")
+
+    # Garante que a variável está definida
+    logger.info(f"Roleta - Retornando saldo final para {nome}: {new_balance_variable_for_return}")
+    return {"resultado": resultado, "ganhou": won, "new_balance": new_balance_variable_for_return}
