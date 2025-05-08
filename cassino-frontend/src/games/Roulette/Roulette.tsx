@@ -1,8 +1,8 @@
-
 import React, { useState, useContext, useRef } from "react";
 import GameContext from "../../context/GameContext";
 import "./Roulette.css";
 import api from "../../services/api";
+import { IBet } from "../../utils/helpers";
 
 const Roulette: React.FC = () => {
   const [betAmount, setBetAmount] = useState<number>(10);
@@ -130,7 +130,7 @@ const Roulette: React.FC = () => {
             type="number"
             value={selectedNumber}
             onChange={(e) => setSelectedNumber(Number(e.target.value))}
-            min="0"
+            min="1"
             max="36"
           />
         </label>
@@ -156,5 +156,24 @@ const Roulette: React.FC = () => {
     </div>
   );
 };
+
+// Classe de aposta para Roleta
+export class RouletteBet implements IBet {
+  amount: number;
+  choice: number;
+  username: string;
+  multiplier: number;
+
+  constructor(amount: number, choice: number, username: string, multiplier: number) {
+    this.amount = amount;
+    this.choice = choice;
+    this.username = username;
+    this.multiplier = multiplier;
+  }
+
+  clone(): RouletteBet {
+    return new RouletteBet(this.amount, this.choice, this.username, this.multiplier);
+  }
+}
 
 export default Roulette;

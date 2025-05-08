@@ -4,6 +4,7 @@ import "./CoinFlip.css";
 import api from "../../services/api";
 import { useGameState } from "../../hooks/useGameState";
 import { IdleState, PlayingState, ResultState } from "../../hooks/CoinFlipStates";
+import { IBet } from "../../utils/helpers";
 
 const CoinFlip: React.FC = () => {
   const [betAmount, setBetAmount] = useState<number>(10);
@@ -30,12 +31,15 @@ const CoinFlip: React.FC = () => {
     setState(new PlayingState());
 
     try {
+      const lastBet = new CoinFlipBet(betAmount, betChoice, username, 2);
+      const betCopy = lastBet.clone();
+
       const response = await api.post("/bet/bet/coinflip", null, {
         params: {
-          amount: betAmount,
-          choice: betChoice.toLowerCase(),
-          nome: username,
-          multiplier: 2,
+          amount: betCopy.amount,
+          choice: betCopy.choice,
+          nome: betCopy.username,
+          multiplier: betCopy.multiplier,
         },
       });
 
@@ -100,5 +104,24 @@ const CoinFlip: React.FC = () => {
     </div>
   );
 };
+
+// Classe de aposta para CoinFlip
+export class CoinFlipBet implements IBet {
+  amount: number;
+  choice: string;
+  username: string;
+  multiplier: number;
+
+  constructor(amount: number, choice: string, username: string, multiplier: number) {
+    this.amount = amount;
+    this.choice = choice;
+    this.username = username;
+    this.multiplier = multiplier;
+  }
+
+  clone(): CoinFlipBet {
+    return new CoinFlipBet(this.amount, this.choice, this.username, this.multiplier);
+  }
+}
 
 export default CoinFlip;
