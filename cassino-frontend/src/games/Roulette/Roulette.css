@@ -1,21 +1,21 @@
-
 .roulette-pizza-page {
   height: 93vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 80px;
+  justify-content: flex-start; /* Ajustado para dar espaço ao conteúdo no topo */
+  padding-top: 50px; /* Reduzido um pouco se necessário, ou ajuste conforme layout */
   background: linear-gradient(to bottom, #111, #222);
   color: #fff;
   font-family: 'Segoe UI', sans-serif;
   text-align: center;
   box-sizing: border-box;
+  overflow-x: hidden; /* Para evitar scroll horizontal se algo escapar */
 }
 
 .roulette-pizza-page h2 {
   font-size: 36px;
-  margin-bottom: 30px;
+  margin-bottom: 20px; /* Reduzido para dar mais espaço à roleta */
   color: gold;
   text-shadow: 1px 1px 3px #000;
 }
@@ -24,7 +24,7 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 30px; /* Ajustado */
   flex-wrap: wrap;
 }
 
@@ -41,50 +41,82 @@
   border-radius: 8px;
   border: 1px solid #aaa;
   background-color: #f9f9f9;
+  color: #333; /* Cor do texto dentro do input */
+  width: 80px; /* Largura para os inputs de número */
 }
 
 .pizza-container {
   width: 400px;
   height: 400px;
-  position: relative;
-  margin-bottom: 40px;
+  position: relative; /* Essencial para o ponteiro e números */
+  margin-bottom: 30px; /* Ajustado */
   border-radius: 50%;
   background: radial-gradient(circle at center, #2c3e50, #1a252f);
   border: 8px solid gold;
-  overflow: hidden;
+  /* overflow: hidden; */ /* Remova ou comente se o ponteiro estiver parcialmente fora */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Ponteiro para indicar o número sorteado */
+.pointer {
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;  /* Metade da largura base do triângulo */
+  border-right: 15px solid transparent; /* Metade da largura base do triângulo */
+  border-top: 25px solid #FFD700;     /* Altura e cor do triângulo */
+  position: absolute;
+  top: -2px; /* Posiciona o ponteiro no topo, sobre a borda. Ajuste fino aqui. */
+              /* Ex: top: calc(0% - 25px / 2 + 4px); para centralizar na borda */
+  left: 50%;
+  transform: translateX(-50%); /* Centraliza o ponteiro horizontalmente */
+  z-index: 20; /* Garante que o ponteiro esteja acima dos números */
+}
+
 .wheel {
-  position: relative;
+  position: relative; /* Necessário para os .number-container serem absolute em relação a ele */
   width: 100%;
   height: 100%;
   border-radius: 50%;
   transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* O background da roleta é o .pizza-container */
 }
 
-.number-slice {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  transform-origin: center center;
+/* Estilos para o display de cada número na roleta */
+.number-display {
+  /* transform: translate(-50%, -YYYpx) é definido inline no TSX */
+  /* width, height, borderRadius definem a aparência do "círculo" do número */
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  width: 34px;   /* Largura do círculo do número */
+  height: 34px;  /* Altura do círculo do número */
+  border-radius: 50%; /* Faz ser um círculo */
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 0 4px rgba(0,0,0,0.7);
+  /* O texto dentro (o número) vai girar junto com seu slot */
+  user-select: none; /* Impede seleção de texto nos números */
 }
 
-.number-slice span {
-  display: block;
-  background: #555;
-  color: white;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 50%;
-  box-shadow: 0 0 5px #000;
+/* Cores dos números */
+.number-green { background-color: #2ecc71; } /* Verde para o 0 */
+.number-red { background-color: #e74c3c; }   /* Vermelho */
+.number-black { background-color: #34495e; } /* Preto/Azul escuro */
+
+
+/* Remover estilos legados de .number-slice se não forem mais usados ou adaptá-los */
+.number-slice {
+  /* Se .number-slice foi substituído por .number-container, pode remover ou verificar o uso. */
+  /* No TSX atualizado, .number-slice não é usado, mas .number-container e .number-display sim. */
+  /* Assegure que não haja conflitos se .number-slice ainda existir no CSS original para outros usos. */
 }
+.number-slice span {
+  /* Similarmente, se a estrutura do span mudou para .number-display, verifique. */
+}
+
 
 button {
   padding: 12px 30px;
@@ -100,7 +132,13 @@ button {
 }
 
 button:hover {
-  background-color: #f1c40f;
+  background-color: #f1c40f; /* Um dourado um pouco mais escuro no hover */
+}
+
+button:disabled {
+  background-color: #aaa; /* Cor para botão desabilitado */
+  color: #555;
+  cursor: not-allowed;
 }
 
 .resultado {
@@ -109,8 +147,9 @@ button:hover {
   border-radius: 10px;
   text-align: center;
   font-size: 18px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6); /* Fundo um pouco mais escuro para contraste */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  min-width: 250px; /* Para garantir uma largura mínima */
 }
 
 .resultado.ganhou {
