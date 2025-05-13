@@ -1,3 +1,7 @@
+```bash
+(https://github.com/leovelani/bet_site/edit/oficial/)
+```
+
 # 🎰 Projeto Cassino - FastAPI + React
 
 Este projeto é um cassino simples com os jogos **Coin Flip** e **Roleta**, utilizando **FastAPI** no backend e **React (TypeScript)** no frontend.
