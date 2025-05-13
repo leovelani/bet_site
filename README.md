@@ -1,5 +1,5 @@
 ```bash
-https://github.com/leovelani/bet_site/edit/oficial/
+[https://github.com/leovelani/bet_site/edit/oficial/]
 ```
 
 # 🎰 Projeto Cassino - FastAPI + React
